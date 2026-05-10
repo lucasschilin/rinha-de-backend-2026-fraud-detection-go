@@ -19,6 +19,8 @@ services:
     build: .
     container_name: api1
     hostname: api1
+    environment:
+      PORT: 9999
     expose:
       - "9999"
     deploy:
@@ -30,6 +32,8 @@ services:
     build: .
     container_name: api2
     hostname: api2
+    environment:
+      PORT: 9999
     expose:
       - "9999"
     deploy:
