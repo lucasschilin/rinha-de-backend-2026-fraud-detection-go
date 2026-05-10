@@ -1,0 +1,12 @@
+services:
+  api1:
+    build: .
+    container_name: api1
+    hostname: api1
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "150MB"
