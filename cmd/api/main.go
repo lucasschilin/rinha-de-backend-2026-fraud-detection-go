@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 )
 
 const port = ":9999"
@@ -52,6 +53,8 @@ type FraudScoreResponse struct {
 }
 
 func readyHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("handled by %s", os.Getenv("HOSTNAME"))
+
 	response := map[string]string{
 		"status": "ok",
 	}
@@ -62,6 +65,8 @@ func readyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func fraudScoreHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("handled by %s", os.Getenv("HOSTNAME"))
+
 	var request FraudScoreRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
