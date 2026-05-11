@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/domain"
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/risk"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
 )
 
@@ -13,7 +14,7 @@ type FraudService struct {
 
 func NewFraudService() *FraudService {
 	return &FraudService{
-		builder: vector.NewBuilder(),
+		builder: vector.NewBuilder(risk.NewDefault()),
 	}
 }
 
