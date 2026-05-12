@@ -3,18 +3,23 @@ package service
 import (
 	"log"
 
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/domain"
-	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/risk"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
 )
 
 type FraudService struct {
 	builder *vector.Builder
+	dataset *dataset.Dataset
 }
 
-func NewFraudService() *FraudService {
+func NewFraudService(
+	builder *vector.Builder,
+	dataset *dataset.Dataset,
+) *FraudService {
 	return &FraudService{
-		builder: vector.NewBuilder(risk.NewDefault()),
+		builder: builder,
+		dataset: dataset,
 	}
 }
 
