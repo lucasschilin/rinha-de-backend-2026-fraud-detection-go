@@ -10,3 +10,7 @@ docker-compose-up:
 
 docker-compose-down:
 	docker compose down
+
+# PREPROCESS REFERENCES
+preprocess-references:
+	go run ./tools/preprocess/main.go

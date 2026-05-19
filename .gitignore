@@ -13,3 +13,6 @@
 
 # Go workspace file
 go.work
+
+# references.bin
+resources/references.bin
