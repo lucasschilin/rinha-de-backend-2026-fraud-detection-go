@@ -16,7 +16,8 @@ func main() {
 
 	start := time.Now()
 
-	ds, err := dataset.Load("resources/references.json.gz")
+	// ds, err := dataset.Load("resources/references.json.gz")
+	ds, err := dataset.LoadBinary("resources/references.bin")
 	if err != nil {
 		log.Fatal(err)
 	}
