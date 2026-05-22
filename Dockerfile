@@ -15,6 +15,7 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/api .
+COPY ./resources/references.bin /app/resources/references.bin
 
 EXPOSE 9999
 
