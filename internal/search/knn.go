@@ -14,14 +14,15 @@ type Neighbor struct {
 	Label uint8
 }
 
-func FindKNN(query vector.Vector, ds *dataset.Dataset) [K]Neighbor {
+func FindKNN(query vector.Vector, ds *dataset.MmapDataset) [K]Neighbor {
 	var closestNeighbors [K]Neighbor
 	for cn := range closestNeighbors {
 		closestNeighbors[cn].Dist = math.MaxFloat32
 	}
 
-	for v := 0; v < len(ds.Vectors); v++ {
-		dist := distanceSquared(query, ds.Vectors[v])
+	for v := 0; v < ds.Count; v++ {
+		vec, label, _ := ds.GetRecord(v)
+		dist := distanceSquared(query, vec)
 
 		furtherIndex := -1
 		furtherDist := float32(-1)
@@ -36,7 +37,7 @@ func FindKNN(query vector.Vector, ds *dataset.Dataset) [K]Neighbor {
 		if dist < furtherDist {
 			closestNeighbors[furtherIndex] = Neighbor{
 				Dist:  dist,
-				Label: ds.Labels[v],
+				Label: label,
 			}
 		}
 	}

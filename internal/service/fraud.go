@@ -11,12 +11,12 @@ import (
 
 type FraudService struct {
 	builder *vector.Builder
-	dataset *dataset.Dataset
+	dataset *dataset.MmapDataset
 }
 
 func NewFraudService(
 	builder *vector.Builder,
-	dataset *dataset.Dataset,
+	dataset *dataset.MmapDataset,
 ) *FraudService {
 	return &FraudService{
 		builder: builder,

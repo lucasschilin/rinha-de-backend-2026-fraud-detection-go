@@ -16,8 +16,7 @@ func main() {
 
 	start := time.Now()
 
-	// ds, err := dataset.Load("resources/references.json.gz")
-	ds, err := dataset.LoadBinary("resources/references.bin")
+	ds, err := dataset.LoadMmap("resources/references.bin", 3_000_000)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,12 +27,12 @@ func main() {
 	runtime.ReadMemStats(&mem)
 
 	log.Printf(
-		"dataset loaded: vectors=%d labels=%d startup=%s memory=%.2fMB",
-		len(ds.Vectors),
-		len(ds.Labels),
+		"dataset loaded: startup=%s memory=%.2fMB",
 		elapsed,
 		float64(mem.Alloc)/1024/1024,
 	)
+
+	log.Println(ds)
 
 	r := router.New(ds)
 

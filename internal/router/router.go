@@ -10,7 +10,7 @@ import (
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
 )
 
-func New(ds *dataset.Dataset) http.Handler {
+func New(ds *dataset.MmapDataset) http.Handler {
 	mux := http.NewServeMux()
 
 	fraudService := service.NewFraudService(
