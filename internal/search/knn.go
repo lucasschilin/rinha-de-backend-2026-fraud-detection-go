@@ -1,5 +1,7 @@
 package search
 
+import "sort"
+
 const K = 5
 
 type Neighbor struct {
@@ -28,6 +30,10 @@ func KNN(root *Node, target [14]float32, k int) []Neighbor {
 
 	dfs(root)
 
+	sort.Slice(best, func(i, j int) bool {
+		return best[i].Dist < best[j].Dist
+	})
+
 	if len(best) > k {
 		best = best[:k]
 	}
@@ -38,11 +44,16 @@ func KNN(root *Node, target [14]float32, k int) []Neighbor {
 func Score(neighbors []Neighbor) float64 {
 	var fraud int
 
-	for n := 0; n < K; n++ {
-		if neighbors[n].Label == 1 {
+	n := K
+	if len(neighbors) < n {
+		n = len(neighbors)
+	}
+
+	for i := 0; i < n; i++ {
+		if neighbors[i].Label == 1 {
 			fraud++
 		}
 	}
 
-	return float64(fraud) / K
+	return float64(fraud) / float64(K)
 }
