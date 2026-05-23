@@ -1,7 +1,5 @@
 package search
 
-import "sort"
-
 const K = 5
 
 type Neighbor struct {
@@ -10,35 +8,44 @@ type Neighbor struct {
 }
 
 func KNN(root *Node, target [14]float32, k int) []Neighbor {
-	best := make([]Neighbor, 0, k)
+	h := NewMaxHeap(k)
 
-	var dfs func(n *Node)
-	dfs = func(n *Node) {
+	var search func(n *Node)
+
+	search = func(n *Node) {
 		if n == nil {
 			return
 		}
 
 		d := Distance(target, n.Point.Vector)
-		best = append(best, Neighbor{
+
+		h.Push(Neighbor{
 			Label: n.Point.Label,
 			Dist:  d,
 		})
 
-		dfs(n.Left)
-		dfs(n.Right)
+		if n.Left == nil && n.Right == nil {
+			return
+		}
+
+		if d < n.Radius {
+			search(n.Left)
+
+			if d+n.Radius >= h.worst() {
+				search(n.Right)
+			}
+		} else {
+			search(n.Right)
+
+			if d-n.Radius <= h.worst() {
+				search(n.Left)
+			}
+		}
 	}
 
-	dfs(root)
+	search(root)
 
-	sort.Slice(best, func(i, j int) bool {
-		return best[i].Dist < best[j].Dist
-	})
-
-	if len(best) > k {
-		best = best[:k]
-	}
-
-	return best
+	return h.Items()
 }
 
 func Score(neighbors []Neighbor) float64 {
@@ -55,5 +62,5 @@ func Score(neighbors []Neighbor) float64 {
 		}
 	}
 
-	return float64(fraud) / float64(K)
+	return float64(fraud) / float64(n)
 }
