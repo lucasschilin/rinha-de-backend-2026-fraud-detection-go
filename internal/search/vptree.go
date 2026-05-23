@@ -1,9 +1,8 @@
 package search
 
 type Node struct {
-	Point  Record
+	Index  int
 	Radius float32
-
-	Left  *Node
-	Right *Node
+	Left   int
+	Right  int
 }

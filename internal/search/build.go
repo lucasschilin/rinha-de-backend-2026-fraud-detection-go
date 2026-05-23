@@ -1,54 +1,39 @@
 package search
 
-import "sort"
+func Build(records []Record) ([]Node, int) {
+	nodes := make([]Node, len(records))
 
-func Build(records []Record) *Node {
-	if len(records) == 0 {
-		return nil
-	}
+	var build func(start, end int) int
 
-	node := &Node{
-		Point: records[0],
-	}
-
-	if len(records) == 1 {
-		return node
-	}
-
-	type item struct {
-		r    Record
-		dist float32
-	}
-
-	items := make([]item, len(records)-1)
-
-	for i := 1; i < len(records); i++ {
-		items[i-1] = item{
-			r:    records[i],
-			dist: Distance(node.Point.Vector, records[i].Vector),
+	build = func(start, end int) int {
+		if start >= end {
+			return -1
 		}
-	}
 
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].dist < items[j].dist
-	})
+		root := start
 
-	median := len(items) / 2
-	node.Radius = items[median].dist
+		nodes[root].Index = root
 
-	left := make([]Record, 0, median)
-	right := make([]Record, 0, len(items)-median)
-
-	for i, it := range items {
-		if i < median {
-			left = append(left, it.r)
-		} else {
-			right = append(right, it.r)
+		if end-start == 1 {
+			nodes[root].Left = -1
+			nodes[root].Right = -1
+			return root
 		}
+
+		mid := (start + end) / 2
+
+		nodes[root].Radius = Distance(
+			records[root].Vector,
+			records[mid].Vector,
+		)
+
+		nodes[root].Left = build(start+1, mid)
+		nodes[root].Right = build(mid, end)
+
+		return root
 	}
 
-	node.Left = Build(left)
-	node.Right = Build(right)
+	root := build(0, len(records))
 
-	return node
+	return nodes, root
 }
