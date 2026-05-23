@@ -6,12 +6,18 @@ import (
 	"runtime"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/config"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/router"
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
 	cfg := config.Load()
 
 	start := time.Now()
