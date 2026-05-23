@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"math"
 
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/search"
 	"golang.org/x/exp/mmap"
 )
 
@@ -30,25 +31,31 @@ func LoadMmap(path string, count int) (*MmapDataset, error) {
 	}, nil
 }
 
-func (d *MmapDataset) GetRecord(index int) ([14]float32, uint8, error) {
-	var vector [14]float32
-
-	offset := int64(index * recordSize)
+func (d *MmapDataset) LoadAll() ([]search.Record, error) {
+	records := make([]search.Record, d.Count)
 
 	buf := make([]byte, recordSize)
 
-	_, err := d.Reader.ReadAt(buf, offset)
-	if err != nil {
-		return vector, 0, err
+	for i := 0; i < d.Count; i++ {
+		offset := int64(i * recordSize)
+
+		_, err := d.Reader.ReadAt(buf, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		var v [14]float32
+
+		for j := 0; j < 14; j++ {
+			bits := binary.LittleEndian.Uint32(buf[j*4 : (j+1)*4])
+			v[j] = math.Float32frombits(bits)
+		}
+
+		records[i] = search.Record{
+			Vector: v,
+			Label:  buf[56],
+		}
 	}
 
-	for i := 0; i < 14; i++ {
-		bits := binary.LittleEndian.Uint32(
-			buf[i*4 : (i+1)*4],
-		)
-		vector[i] = math.Float32frombits(bits)
-	}
-	label := buf[56]
-
-	return vector, label, nil
+	return records, nil
 }

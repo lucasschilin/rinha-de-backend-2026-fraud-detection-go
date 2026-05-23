@@ -1,12 +1,5 @@
 package search
 
-import (
-	"math"
-
-	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
-	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
-)
-
 const K = 5
 
 type Neighbor struct {
@@ -14,38 +7,35 @@ type Neighbor struct {
 	Label uint8
 }
 
-func FindKNN(query vector.Vector, ds *dataset.MmapDataset) [K]Neighbor {
-	var closestNeighbors [K]Neighbor
-	for cn := range closestNeighbors {
-		closestNeighbors[cn].Dist = math.MaxFloat32
-	}
+func KNN(root *Node, target [14]float32, k int) []Neighbor {
+	best := make([]Neighbor, 0, k)
 
-	for v := 0; v < ds.Count; v++ {
-		vec, label, _ := ds.GetRecord(v)
-		dist := distanceSquared(query, vec)
-
-		furtherIndex := -1
-		furtherDist := float32(-1)
-
-		for j := 0; j < K; j++ {
-			if closestNeighbors[j].Dist > furtherDist {
-				furtherDist = closestNeighbors[j].Dist
-				furtherIndex = j
-			}
+	var dfs func(n *Node)
+	dfs = func(n *Node) {
+		if n == nil {
+			return
 		}
 
-		if dist < furtherDist {
-			closestNeighbors[furtherIndex] = Neighbor{
-				Dist:  dist,
-				Label: label,
-			}
-		}
+		d := Distance(target, n.Point.Vector)
+		best = append(best, Neighbor{
+			Label: n.Point.Label,
+			Dist:  d,
+		})
+
+		dfs(n.Left)
+		dfs(n.Right)
 	}
 
-	return closestNeighbors
+	dfs(root)
+
+	if len(best) > k {
+		best = best[:k]
+	}
+
+	return best
 }
 
-func Score(neighbors [K]Neighbor) float64 {
+func Score(neighbors []Neighbor) float64 {
 	var fraud int
 
 	for n := 0; n < K; n++ {
@@ -55,15 +45,4 @@ func Score(neighbors [K]Neighbor) float64 {
 	}
 
 	return float64(fraud) / K
-}
-
-func distanceSquared(a, b vector.Vector) float32 {
-	var sum float32
-
-	for d := 0; d < len(a); d++ {
-		diff := a[d] - b[d]
-		sum += diff * diff
-	}
-
-	return sum
 }

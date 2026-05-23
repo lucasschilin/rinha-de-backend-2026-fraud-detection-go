@@ -22,9 +22,9 @@ type Builder struct {
 	mccRisk risk.MCCRisk
 }
 
-func NewBuilder(mccRisk risk.MCCRisk) *Builder {
+func NewBuilder() *Builder {
 	return &Builder{
-		mccRisk: mccRisk,
+		mccRisk: risk.NewDefault(),
 	}
 }
 

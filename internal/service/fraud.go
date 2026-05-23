@@ -3,7 +3,6 @@ package service
 import (
 	"log"
 
-	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/domain"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/search"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
@@ -11,16 +10,16 @@ import (
 
 type FraudService struct {
 	builder *vector.Builder
-	dataset *dataset.MmapDataset
+	tree    *search.Node
 }
 
 func NewFraudService(
 	builder *vector.Builder,
-	dataset *dataset.MmapDataset,
+	tree *search.Node,
 ) *FraudService {
 	return &FraudService{
 		builder: builder,
-		dataset: dataset,
+		tree:    tree,
 	}
 }
 
@@ -28,7 +27,7 @@ func (s *FraudService) Score(request domain.FraudScoreRequest) domain.FraudScore
 	v := s.builder.Build(request)
 	log.Printf("vectorized payload=%v", v)
 
-	neighbors := search.FindKNN(v, s.dataset)
+	neighbors := search.KNN(s.tree, v, search.K)
 	log.Printf("neighbors=%v", neighbors)
 
 	score := search.Score(neighbors)

@@ -11,6 +11,9 @@ import (
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/config"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
 	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/router"
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/search"
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/service"
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/vector"
 )
 
 func main() {
@@ -27,6 +30,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	records, err := ds.LoadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	tree := search.Build(records)
+
 	elapsed := time.Since(start)
 
 	var mem runtime.MemStats
@@ -40,7 +49,10 @@ func main() {
 
 	log.Println(ds)
 
-	r := router.New(ds)
+	vectorBuilder := vector.NewBuilder()
+
+	fraudService := service.NewFraudService(vectorBuilder, tree)
+	r := router.New(fraudService)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
