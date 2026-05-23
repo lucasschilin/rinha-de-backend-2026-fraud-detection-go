@@ -10,8 +10,8 @@ type Neighbor struct {
 func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []Neighbor {
 	h := NewMaxHeap(k)
 
-	var dfs func(i int)
-	dfs = func(i int) {
+	var search func(i int)
+	search = func(i int) {
 		if i == -1 {
 			return
 		}
@@ -25,15 +25,33 @@ func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []
 			Dist:  d,
 		})
 
-		if n.Left != -1 {
-			dfs(n.Left)
+		if n.Left == -1 && n.Right == -1 {
+			return
 		}
-		if n.Right != -1 {
-			dfs(n.Right)
+
+		var first, second int
+		if d < n.Radius {
+			first = n.Left
+			second = n.Right
+		} else {
+			first = n.Right
+			second = n.Left
+		}
+
+		if first != -1 {
+			search(first)
+		}
+
+		if second != -1 {
+			worst := h.worst()
+
+			if d-n.Radius <= worst && d+n.Radius >= 0 {
+				search(second)
+			}
 		}
 	}
 
-	dfs(root)
+	search(root)
 
 	return h.Items()
 }
