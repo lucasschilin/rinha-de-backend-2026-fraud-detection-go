@@ -30,11 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	records, err := ds.LoadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-	tree, root := search.Build(records)
+	tree, root := search.Build(ds)
 
 	elapsed := time.Since(start)
 
@@ -51,7 +47,7 @@ func main() {
 
 	vectorBuilder := vector.NewBuilder()
 
-	fraudService := service.NewFraudService(vectorBuilder, tree, records, root)
+	fraudService := service.NewFraudService(vectorBuilder, tree, ds, root)
 	r := router.New(fraudService)
 
 	server := &http.Server{

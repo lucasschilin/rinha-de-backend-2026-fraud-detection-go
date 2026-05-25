@@ -1,7 +1,9 @@
 package search
 
-func Build(records []Record) ([]Node, int) {
-	nodes := make([]Node, len(records))
+import "github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
+
+func Build(ds *dataset.MmapDataset) ([]Node, int) {
+	nodes := make([]Node, ds.Count)
 
 	var build func(start, end int) int
 
@@ -22,10 +24,10 @@ func Build(records []Record) ([]Node, int) {
 
 		mid := (start + end) / 2
 
-		nodes[root].Radius = Distance(
-			records[root].Vector,
-			records[mid].Vector,
-		)
+		rootVector, _, _ := ds.GetRecord(root)
+		midVector, _, _ := ds.GetRecord(mid)
+
+		nodes[root].Radius = Distance(rootVector, midVector)
 
 		nodes[root].Left = build(start+1, mid)
 		nodes[root].Right = build(mid, end)
@@ -33,7 +35,7 @@ func Build(records []Record) ([]Node, int) {
 		return root
 	}
 
-	root := build(0, len(records))
+	root := build(0, ds.Count)
 
 	return nodes, root
 }

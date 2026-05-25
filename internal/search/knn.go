@@ -1,5 +1,9 @@
 package search
 
+import (
+	"github.com/lucasschilin/rinha-de-backend-2026-fraud-detection-go/internal/dataset"
+)
+
 const K = 5
 
 type Neighbor struct {
@@ -7,10 +11,17 @@ type Neighbor struct {
 	Label uint8
 }
 
-func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []Neighbor {
+func KNN(
+	nodes []Node,
+	ds *dataset.MmapDataset,
+	root int,
+	target [14]float32,
+	k int,
+) []Neighbor {
 	h := NewMaxHeap(k)
 
 	var search func(i int)
+
 	search = func(i int) {
 		if i == -1 {
 			return
@@ -18,10 +29,12 @@ func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []
 
 		n := nodes[i]
 
-		d := Distance(target, records[n.Index].Vector)
+		vector, label, _ := ds.GetRecord(n.Index)
+
+		d := Distance(target, vector)
 
 		h.Push(Neighbor{
-			Label: records[n.Index].Label,
+			Label: label,
 			Dist:  d,
 		})
 
@@ -30,6 +43,7 @@ func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []
 		}
 
 		var first, second int
+
 		if d < n.Radius {
 			first = n.Left
 			second = n.Right
@@ -43,9 +57,7 @@ func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []
 		}
 
 		if second != -1 {
-			worst := h.worst()
-
-			if d-n.Radius <= worst && d+n.Radius >= 0 {
+			if d-n.Radius <= h.worst() {
 				search(second)
 			}
 		}
@@ -59,16 +71,11 @@ func KNN(nodes []Node, records []Record, root int, target [14]float32, k int) []
 func Score(neighbors []Neighbor) float64 {
 	var fraud int
 
-	n := K
-	if len(neighbors) < n {
-		n = len(neighbors)
-	}
-
-	for i := 0; i < n; i++ {
-		if neighbors[i].Label == 1 {
+	for n := 0; n < K; n++ {
+		if neighbors[n].Label == 1 {
 			fraud++
 		}
 	}
 
-	return float64(fraud) / float64(n)
+	return float64(fraud) / K
 }
