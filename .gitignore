@@ -16,3 +16,6 @@ go.work
 
 # references.bin
 resources/references.bin
+
+# test
+test/results.json
