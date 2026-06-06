@@ -69,13 +69,18 @@ func KNN(
 }
 
 func Score(neighbors []Neighbor) float64 {
-	var fraud int
+	var fraudWeight float64
+	var totalWeight float64
 
-	for n := 0; n < K; n++ {
-		if neighbors[n].Label == 1 {
-			fraud++
+	for _, n := range neighbors {
+		w := 1.0 / (float64(n.Dist) + 0.0001)
+
+		totalWeight += w
+
+		if n.Label == 1 {
+			fraudWeight += w
 		}
 	}
 
-	return float64(fraud) / K
+	return fraudWeight / totalWeight
 }
