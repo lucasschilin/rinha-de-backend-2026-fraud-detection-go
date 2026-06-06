@@ -16,7 +16,7 @@ services:
           cpus: "0.20"
           memory: "30MB"
   api1:
-    image: ghcr.io/lucasschilin/rinha-de-backend-2026-fraud-detection-go:vp-tree-RAM-optimization
+    image: ghcr.io/lucasschilin/rinha-de-backend-2026-fraud-detection-go:vp-tree-RAM-optimization-final
     container_name: api1
     hostname: api1
     environment:
@@ -29,7 +29,7 @@ services:
           cpus: "0.40"
           memory: "160MB"
   api2:
-    image: ghcr.io/lucasschilin/rinha-de-backend-2026-fraud-detection-go:vp-tree-RAM-optimization
+    image: ghcr.io/lucasschilin/rinha-de-backend-2026-fraud-detection-go:vp-tree-RAM-optimization-final
     container_name: api2
     hostname: api2
     environment:
